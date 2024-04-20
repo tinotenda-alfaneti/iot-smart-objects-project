@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Objects Management</title>
+    <!-- Materialize CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Aptos" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Chartist CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.css">
+    <style>
+        html, body {
+            font-family: 'Aptos', sans-serif; /* Changed font to Aptos */
+            color: #fff; /* Set text color to white */
+        }
+
+        html {
+            background: #1F1C2C;
+        }
+
+        .navbar {
+            background-color: #cc3000; /* Same color as the top nav */
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .navbar-title {
+            margin-right: auto;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        #sidebar {
+            width: 220px;
+            background-color: #cc3000; /* Same color as the top nav */
+            transition: background-color 0.3s; /* Smooth transition on hover */
+            margin: 0; /* Remove default margin */
+            padding: 0; /* Remove default padding */
+        }
+
+        #sidebar li {
+            padding: 10px;
+            font-size: 1.2rem;
+            list-style-type: none; /* Remove bullet points */
+        }
+
+        #sidebar li:hover {
+            background-color: #080401; /* Top nav color on hover */
+        }
+
+        #sidebar li a {
+            color: #fff;
+        }
+
+        .add-sensor {
+            color: #fff;
+            margin-left: 20px;
+            font-weight: bold; /* Bolded "Add Smart Object" */
+        }
+
+        /* Set headings to capital letter and bold */
+        #content table thead th {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Popup form style */
+        .modal {
+            background-color: #1F1C2C; /* Same color as the background */
+            box-shadow: none; /* Remove white outline */
+            overflow-y: hidden; /* Hide vertical scrollbar */
+        }
+
+        /* Input text color */
+        .modal-content input[type="text"] {
+            color: #fff;
+        }
+
+        /* Remove white area below modal */
+        .modal-content {
+            padding-bottom: 0;
+        }
+
+        /* Submit button style */
+        .modal-footer {
+            background: transparent; /* Transparent background */
+            border-top: none; /* Remove top border */
+            text-align: center; /* Center the button */
+            border-radius: 20px; /* Rounded corners */
+        }
+
+        .modal-footer button.modal-close {
+            color: #fff; /* White text color */
+            background-color: #cc3000; /* #cc3000 background color */
+            padding: 10px 20px; /* Padding */
+            border-radius: 20px; /* Rounded corners */
+            transition: background-color 0.3s; /* Smooth transition on hover */
+        }
+
+        .modal-footer button.modal-close:hover {
+            background-color: #fff; /* White background color on hover */
+            color: #cc3000; /* Change text color on hover */
+        }
+
+        /* Dropdown content style */
+        .dropdown-content {
+            background-color: #cc3000; /* Same color as the top nav */
+            color: #fff;
+            margin-top: 0 !important;
+            width: 270px; /* Set width for the dropdown */
+            font-family: 'Aptos', sans-serif; /* Changed font to Aptos */
+        }
+
+        /* Center alignment for current readings */
+        #content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .dropdown-button {
+            background-color: transparent;
+            border: none;
+            color: #fff; /* Set text color to white */
+            cursor: pointer;
+            padding: 0; /* Add padding to create space for text */
+        }
+        .dropdown-content {
+            background-color: #cc3000; /* Set default background color */
+            color: #fff;
+            margin-top: 0 !important;
+            width: 270px; /* Set width for the dropdown */
+            font-family: 'Aptos', sans-serif; /* Changed font to Aptos */
+        }
+
+        .dropdown-content li:hover {
+            background-color: #cc3000; /* Change background color on hover */
+        }
+
+        .dropdown-content li a {
+            text-align: center; /* Center align text */
+        }
+
+        .dropdown-button {
+            background-color: transparent;
+            border: none;
+            color: #fff; /* Set text color to white */
+            cursor: pointer;
+            padding: 0; /* Add padding to create space for text */
+        }
+
+    </style>
+    <base href="http://localhost/iot/smartObjectsWeb/" target="_blank">
+</head>
+<body>
+    <nav class="navbar deep-orange accent-4">
+        <div class="navbar-title">Smart Objects Management</div>
+        <ul id="smartObjectDropdown" class="dropdown-content">
+            <!-- <li><a href="#smartObject1">Smart Object 1</a></li>
+            <li><a href="#smartObject2">Smart Object 2</a></li> -->
+            <!-- Add more smart objects as needed -->
+        </ul>
+        <a class="dropdown-trigger add-sensor" href="#" data-target="smartObjectDropdown">Smart Objects</a>
+        <a href="#" class="add-sensor modal-trigger" data-target="addSmartObjectModal">Add Smart Object</a> <!-- Added modal-trigger class -->
+    </nav>
+
+    <div class="row">
+        <div class="col s12" id="content">
+            <h4>Current Readings</h4>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th>Smart Object Name</th>
+                        <th>Sensor Type</th>
+                        <th>Sensor Name</th>
+                        <th>Sensor Location</th>
+                        <th>Readings</th> <!-- Added Readings column -->
+                        <th>Date and Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dummy readings with alternating row colors -->
+                    <tr style="background-color: #2C2A3C;">
+                        <td>Smart Object 1</td>
+                        <td>Sensor 1</td>
+                        <td>Location 1</td>
+                        <td>120</td> <!-- Dummy reading -->
+                        <td>2024-04-05 10:30:00</td>
+                    </tr>
+                    <tr style="background-color: #1F1C2C;">
+                        <td>Smart Object 2</td>
+                        <td>Sensor 2</td>
+                        <td>Location 2</td>
+                        <td>85</td> <!-- Dummy reading -->
+                        <td>2024-04-05 10:45:00</td>
+                    </tr>
+                    <tr style="background-color: #2C2A3C;">
+                        <td>Smart Object 1</td>
+                        <td>Sensor 1</td>
+                        <td>Location 1</td>
+                        <td>120</td> <!-- Dummy reading -->
+                        <td>2024-04-05 10:30:00</td>
+                    </tr>
+                    <!-- Add more readings as needed -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Smart Object modal -->
+    <div id="addSmartObjectModal" class="modal">
+        <div class="modal-content">
+            <h4>Add Smart Object</h4>
+            <div class="row">
+                <form id="addSmartObjectForm" class="col s12">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <input id="smartObjectName" type="text" class="validate">
+                            <label for="smartObjectName">Smart Object Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <input id="smartObjectLocation" type="text" class="validate">
+                            <label for="smartObjectLocation">Smart Object Location</label>
+                        </div>
+                    </div>
+                    <div class="row center-align">
+                        <button id="submitSmartObject" class="modal-close waves-effect waves-light btn-flat white-text">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Chartist JS -->
+    <script src="https://cdn.jsdelivr.net/chartist.js/latest/chartist.min.js"></script>
+    <script>
+        // Initialize modal and dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            var modals = document.querySelectorAll('.modal');
+            var dropdowns = document.querySelectorAll('.dropdown-trigger');
+            M.Modal.init(modals);
+            M.Dropdown.init(dropdowns, {
+                coverTrigger: false,
+                alignment: 'left'
+            });
+        });
+    </script>
+    <script>
+      // Fetch data from PHP endpoint to populate readings
+      var xhrReadings = new XMLHttpRequest();
+      xhrReadings.open('GET', 'smartobjectapi.php', true);
+      xhrReadings.onreadystatechange = function () {
+          if (xhrReadings.readyState === XMLHttpRequest.DONE) {
+              if (xhrReadings.status === 200) {
+                  var readingsData = JSON.parse(xhrReadings.responseText);
+                  populateReadingsTable(readingsData);
+              } else {
+                  console.error('Error fetching data:', xhrReadings.status);
+              }
+          }
+      };
+      xhrReadings.send();
+
+      // Function to populate readings table with data
+      function populateReadingsTable(data) {
+          var tbody = document.querySelector('#content table tbody');
+          tbody.innerHTML = ''; // Clear existing table rows
+
+          data.forEach(function(item) {
+              var row = document.createElement('tr');
+              row.dataset.smartObjectID = item.smartObjectID;
+              row.innerHTML = `
+                  <td>${item.smartObjectName}</td>
+                  <td>${item.sensorType}</td>
+                  <td>${item.sensorName}</td>
+                  <td>${item.smartObjectLocation}</td>
+                  <td>${item.currentReading}</td>
+                  <td>${item.recordedTime}</td>
+              `;
+              tbody.appendChild(row);
+          });
+      }
+    </script>
+
+
+<script>
+
+    // Fetch smart objects from the database
+        var xhrSmartObjects = new XMLHttpRequest();
+        xhrSmartObjects.open('GET', 'smartobjectapi.php/smo', true);
+        xhrSmartObjects.onreadystatechange = function () {
+            if (xhrSmartObjects.readyState === XMLHttpRequest.DONE && xhrSmartObjects.status === 200) {
+                var smartObjects = JSON.parse(xhrSmartObjects.responseText);
+                populateSmartObjectsDropdown(smartObjects);
+            }
+        };
+        xhrSmartObjects.send();
+
+        // Function to populate smart objects dropdown
+        function populateSmartObjectsDropdown(smartObjects) {
+            var dropdown = document.getElementById('smartObjectDropdown');
+            dropdown.innerHTML = ''; // Clear existing dropdown content
+
+            smartObjects.forEach(function(smartObject) {
+                var li = document.createElement('li');
+                var button = document.createElement('button');
+                button.textContent = smartObject.smartObjectName;
+                button.classList.add('dropdown-button'); // Add a class for styling
+                button.addEventListener('click', function() {
+                    // When a smart object is clicked, filter readings
+                    filterReadingsBySmartObject(smartObject.smartObjectID);
+                });
+                li.appendChild(button);
+                dropdown.appendChild(li);
+            });
+
+            // Initialize dropdown after populating options
+            var dropdownInstances = M.Dropdown.init(dropdown, {
+                coverTrigger: false,
+                alignment: 'left'
+            });
+        }
+
+        // Function to filter readings by smart object
+        function filterReadingsBySmartObject(smartObjectId) {
+            var rows = document.querySelectorAll('#content table tbody tr');
+            rows.forEach(function(row) {
+                if (row.dataset.smartObjectID === smartObjectId) {
+                    row.style.display = ''; // Show rows for the selected smart object
+                } else {
+                    row.style.display = 'none'; // Hide rows for other smart objects
+                }
+            });
+        }
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modal and dropdown
+            var modals = document.querySelectorAll('.modal');
+            var dropdowns = document.querySelectorAll('.dropdown-trigger');
+            M.Modal.init(modals);
+            M.Dropdown.init(dropdowns, {
+                coverTrigger: false,
+                alignment: 'left'
+            });
+
+            // Add event listener for form submission
+            var form = document.getElementById('addSmartObjectForm');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Prevent default form submission
+                addSmartObject();
+            });
+        });
+
+        // Function to add a smart object
+        function addSmartObject() {
+            var smartObjectName = document.getElementById('smartObjectName').value;
+            var smartObjectLocation = document.getElementById('smartObjectLocation').value;
+
+            // Create a FormData object to send form data
+            var formData = new FormData();
+            formData.append('smartObjectName', smartObjectName);
+            formData.append('smartObjectLocation', smartObjectLocation);
+
+            // Send form data using XMLHttpRequest
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'smartobjectapi.php/add', true);
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    // Do something after successfully adding the smart object
+                    console.log('Smart object added successfully');
+                    // You may want to update the dropdown with the new smart object here
+                }
+            };
+            xhr.send(formData);
+        }
+
+</script>
+
+</body>
+</html>
